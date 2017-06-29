@@ -6,7 +6,7 @@ document.getElementById("content").appendChild(elemento);
 const canvas = elemento.getContext("2d");
 
 class Graficos {
-    static atualizar() {
+    static atualizar(pista, carros) {
         // Manipula o canvas
         canvas.fillStyle = "red";
         canvas.fillRect(20, 20, 640, 480);
