@@ -1,10 +1,18 @@
-const path = require("path");
+var path = require('path');
 
 module.exports = {
-    entry: "./src/main.js",
+    entry: path.join(__dirname, 'src/main.ts'),
     output: {
-        path: path.resolve(__dirname, "src"),
-        filename: "main.bundle.js",
+        path: path.join(__dirname, 'dist'),
+        filename: 'main.bundle.js'
     },
-    devtool: "source-map"
+    resolve: {
+        extensions: ['.ts', '.js', 'json'],
+    },
+    module: {
+        rules: [
+            { test: /\.ts$/, loader: 'ts-loader' }
+        ]
+    },
+    devtool: 'cheap-source-map'
 };
