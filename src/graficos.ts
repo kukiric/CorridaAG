@@ -1,4 +1,5 @@
 import {Pista} from "./pista";
+import {Carro} from "./carro";
 
 // Pega o canvas do HTML
 const canvas = <HTMLCanvasElement>document.getElementById("canvas");
@@ -7,7 +8,7 @@ canvas.width = 1024;
 canvas.height = 768;
 
 export class Graficos {
-    public static atualizar(pista: Pista, carros: any) {
+    public static atualizar(pista: Pista, carros: Carro[], delta: number) {
         let bloco = {
             largura: canvas.width / pista.largura,
             altura: canvas.height / pista.altura
@@ -25,6 +26,5 @@ export class Graficos {
                 ctx.fillRect(i * bloco.largura, j * bloco.altura, bloco.largura, bloco.altura);
             });
         });
-        ctx.stroke();
     }
 }
