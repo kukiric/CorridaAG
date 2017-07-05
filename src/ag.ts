@@ -36,7 +36,7 @@ export default class Cromossomo {
     }
 
     // Modifica uma conexão aleatória
-    public mutar() {
+    public causarMutacao() {
         // Duplica a rede antes de alterar ela
         this.redeJson = JSON.parse(JSON.stringify(this.redeJson));
         _.sample(this.redeJson.connections).weight = Math.random() * 2 - 1;
@@ -58,8 +58,28 @@ export default class Cromossomo {
         return novo;
     }
 
-    // Seleciona dois indivíduos para o cruzamento por roleta
-    public static selecao(genes: Cromossomo[]) {
-        
+    public static vetorChances(individuos: Cromossomo[]) {
+        let chances: number[] = [];
+        // Preenche o vetor de chances
+        individuos.forEach((individuo, id) => {
+            for (let i = 0; i < individuo.fitness; i++) {
+                chances.push(id);
+            }
+        });
+        return chances;
+    }
+
+    // Seleciona dois indivíduos aleatóriso para o cruzamento por roleta
+    public static selecao(chances: number[]) {
+        let a = 0;
+        let b = 0;
+        while (a == b) {
+            a = _.sample(chances);
+            b = _.sample(chances);
+        }
+        return {
+            a: a,
+            b: b
+        };
     }
 }

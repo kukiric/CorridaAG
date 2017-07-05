@@ -45,9 +45,14 @@ export default class Tela {
         })
     }
 
+    // Limpa a tela
+    public static limpar() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
     // Pinta a tela
     public static atualizar(pista: Pista, carros: Carro[]) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        Tela.limpar();
         // Desenha o fundo e a pista
         ctx.imageSmoothingEnabled = false;
         ctx.lineWidth = 1;

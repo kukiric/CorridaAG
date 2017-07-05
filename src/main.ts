@@ -1,4 +1,5 @@
 import * as Matter from "matter-js";
+import Cromossomo from "./ag";
 import Tela from "./tela";
 import Pista from "./pista";
 import Carro from "./carro";
@@ -7,6 +8,7 @@ declare global {
     interface Window {
         engine: Matter.Engine;
         pista: Pista;
+        rodando: boolean;
     }
 }
 
@@ -42,15 +44,39 @@ window.addEventListener("keypress", (ev) => {
     }
 })
 
-let ultimoTempo = performance.now();
-
 // Define a função principal
 let main = () => {
-    let tempoAtual = performance.now();
-    Matter.Engine.update(window.engine, 1/60);
-    carros.forEach(carro => carro.update());
-    Tela.atualizar(window.pista, carros);
-    ultimoTempo = tempoAtual;
+    // Atualiza a simulação
+    if (window.rodando) {
+        Matter.Engine.update(window.engine, 1/60);
+        carros.forEach(carro => carro.update());
+        Tela.atualizar(window.pista, carros);
+    }
+    // Cria a próxima geraçào
+    else {
+        Tela.limpar();
+        // Extrai os cromossomos
+        let cromossomos = carros.map(carro => carro.cromossomo);
+        // Mutação (10%)
+        cromossomos.forEach((gene, i) => {
+            if (Math.random() < 0.1) {
+                gene.causarMutacao();
+                console.log("Mutação causada no indivíduo " + i);
+            }
+        });
+        // Cruzamento (2 em 2)
+        let chances = Cromossomo.vetorChances(cromossomos);
+        cromossomos.map(() => {
+            let pais = Cromossomo.selecao(chances);
+            return cromossomos[pais.a].cruzar(cromossomos[pais.b]);
+        });
+        // Reconstroi os carros com os novos cromossomos
+        carros = carros.map((carro, i) => {
+            return new Carro(posInicio.x, posInicio.y, cromossomos[i]);
+        });
+        // Volta à simulação
+        window.rodando = true;
+    }
     requestAnimationFrame(main);
 };
 
@@ -58,6 +84,7 @@ let main = () => {
 let loop = setInterval(() => {
     if (Tela.tudoPronto()) {
         clearInterval(loop);
+        window.rodando = true;
         requestAnimationFrame(main);
     }
 }, 10);
