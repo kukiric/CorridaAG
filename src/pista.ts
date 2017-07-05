@@ -1,6 +1,10 @@
 import * as Matter from "matter-js";
 import * as _ from "lodash";
 
+export interface ChaoPista extends Matter.Body {
+    numero: number;
+}
+
 export default class Pista {
 
     public paredes: Matter.Body[];
@@ -24,7 +28,8 @@ export default class Pista {
             // Parede (com colisão)
             if (elemento == 0) {
                 obj = Matter.Bodies.rectangle(pos.x, pos.y, this.escala, this.escala, {
-                    isStatic: true
+                    isStatic: true,
+                    label: "Parede"
                 });
                 this.paredes.push(obj);
             }
@@ -33,8 +38,9 @@ export default class Pista {
                 obj = Matter.Bodies.rectangle(pos.x, pos.y, this.escala, this.escala, {
                     isStatic: true,
                     isSensor: true,
-                    label: elemento.toString()
+                    label: "Chão"
                 });
+                (obj as ChaoPista).numero = elemento;
             }
             Matter.World.addBody(mundo, obj);
         });

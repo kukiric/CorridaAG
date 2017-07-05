@@ -3,11 +3,16 @@ import * as Matter from "matter-js";
 import * as _ from "lodash";
 import Tela from "./tela";
 import Cromossomo from "./ag";
+import {ChaoPista} from "./pista";
 
 interface Raycast {
     inicio: Matter.Vector;
     fim: Matter.Vector;
     objetos: any[];
+}
+
+export interface BodyCarro extends Matter.Body {
+    carro?: Carro
 }
 
 export default class Carro {
@@ -25,7 +30,7 @@ export default class Carro {
         [ 60, 66],
     ];
 
-    private obj: Matter.Body;
+    private obj: BodyCarro;
     private blocoAtual: number;
     private raycasts: Raycast[];
     private rede: Synaptic.Network;
@@ -34,20 +39,55 @@ export default class Carro {
 
     constructor(x: number, y: number, gene?: Cromossomo) {
         this.obj = Matter.Bodies.rectangle(x, y, 14, 24);
+        this.obj.carro = this;
         // Colide somente com as paredes (último bit)
         this.obj.collisionFilter.mask = 0b0001;
         // Categoria dos carros (penúltimo bit)
         this.obj.collisionFilter.category = 0b0010;
-        (this.obj as any).carro = this;
-        this.blocoAtual = 1;
+        this.blocoAtual = 0;
         this.nomeSprite = _.sample(Object.keys(Tela.sprites));
         if (gene == undefined) {
             gene = Cromossomo.aleatorio();
         }
         this.cromossomo = gene;
-        this.cromossomo.mutar();
-        this.cromossomo.cruzar(this.cromossomo);
+        this.cromossomo.fitness = this.blocoAtual;
         this.rede = Synaptic.Network.fromJSON(this.cromossomo.redeJson);
+        Matter.Events.on(window.engine, "collisionStart", this.onColisao.bind(this));
+    }
+
+    public onColisao(evento: Matter.IEventCollision<Matter.Engine>) {
+        // Checa se a colisão é com o chão
+        evento.pairs.forEach(par => {
+            let chao = par.bodyA as ChaoPista;
+            if (chao.numero !== undefined) {
+                this.atualizaBloco(chao.numero);
+            }
+            else {
+                chao = par.bodyA as ChaoPista;
+                if (chao.numero !== undefined) {
+                    this.atualizaBloco(chao.numero);
+                }
+            }
+        })
+    }
+
+    public atualizaBloco(novoBloco: number) {
+        // Aumenta o fitness
+        if (novoBloco == this.blocoAtual + 1) {
+            console.log("carro foi pra frente!");
+            this.blocoAtual = novoBloco;
+            this.cromossomo.fitness = novoBloco;
+            if (novoBloco > Tela.melhor) {
+                Tela.melhor = novoBloco;
+            }
+        }
+        // Completa a simulação
+        else if (this.blocoAtual == window.pista.max && novoBloco == 1) {
+            alert("Um carro completou a corrida!");
+        }
+        else {
+            console.log("carro indo pra tras!");
+        }
     }
 
     // Adiciona o carro na engine de física
@@ -94,6 +134,6 @@ export default class Carro {
         let forcaEsquerda = saidas[0];
         let forcaDireita = saidas[1];
         let direcao = forcaDireita - forcaEsquerda;
-        Matter.Body.setAngularVelocity(this.obj, 0.1 * direcao);
+        Matter.Body.setAngularVelocity(this.obj, 0.25 * direcao);
     }
 }

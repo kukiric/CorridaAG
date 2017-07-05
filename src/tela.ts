@@ -35,7 +35,8 @@ export default class Tela {
         carroAmarelo: new Sprite("sprites/car_yellow_5.png"),
     };
 
-    public static debug: boolean = false;
+    public static debug = false;
+    public static melhor = 0;
 
     // Checa se todas as sprites estão carregadas
     public static tudoPronto() {
@@ -49,6 +50,7 @@ export default class Tela {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         // Desenha o fundo e a pista
         ctx.imageSmoothingEnabled = false;
+        ctx.lineWidth = 1;
         pista.matriz.forEach((elemento, pos) => {
             const x = pista.posReal(pos).x;
             const y = pista.posReal(pos).y;
@@ -74,6 +76,9 @@ export default class Tela {
                     ctx.fillStyle = "#3C3C3C";
                     ctx.font = "bold " + altura + "px sans-serif";
                     ctx.fillText(texto, x - largura/2 + pista.escala/2, y + altura/3 + pista.escala/2);
+                    ctx.strokeStyle = "black";
+                    ctx.rect(x, y, pista.escala, pista.escala);
+                    ctx.stroke();
                 }
             }
         });
@@ -108,5 +113,9 @@ export default class Tela {
             ctx.drawImage(imagem, -imagem.width/2, -imagem.height/2);
             ctx.restore();
         });
+        // Desenha o melhor fitness até agora
+        ctx.fillStyle = "white";
+        ctx.font = "40px sans-serif";
+        ctx.fillText("Melhor fitness: " + Tela.melhor, 16, 56);
     }
 }
