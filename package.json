@@ -10,17 +10,10 @@
   "license": "MIT",
   "dependencies": {
     "@types/synaptic": "^1.0.2",
-    "phaser": "^2.6.2",
     "synaptic": "^1.0.12",
     "ts-loader": "^2.2.2",
     "typescript": "^2.4.1",
     "webpack": "^3.0.0",
     "webpack-dev-server": "^2.5.0"
-  },
-  "devDependencies": {
-    "clean-webpack-plugin": "^0.1.16",
-    "expose-loader": "^0.7.3",
-    "html-webpack-plugin": "^2.29.0",
-    "webpack-shell-plugin": "^0.5.0"
   }
 }
