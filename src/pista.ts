@@ -1,4 +1,4 @@
-import {World, Body, Bodies} from "matter-js";
+import * as Matter from "matter-js";
 import * as _ from "lodash";
 
 export default class Pista {
@@ -9,12 +9,21 @@ export default class Pista {
     public max: number;
     public escala: number;
 
-    constructor(matriz: number[], colunas: number, escala: number, mundo: World) {
+    constructor(matriz: number[], colunas: number, escala: number, mundo: Matter.World) {
         this.matriz = matriz;
         this.linhas = Math.trunc(matriz.length / colunas);
         this.colunas = colunas;
         this.escala = escala;
         this.max = _.max(matriz);
+        // Cria os objetos na engine de fisica
+        matriz.forEach((elemento, i) => {
+            let pos = this.posRealCentro(i);
+            if (elemento == 0) {
+                let obj = Matter.Bodies.rectangle(pos.x, pos.y, this.escala, this.escala);
+                Matter.Body.setStatic(obj, true);
+                Matter.World.addBody(mundo, obj);
+            }
+        });
     }
 
     // Converte a posição do vetor para posição [x, y]

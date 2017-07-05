@@ -45,10 +45,10 @@ export default class Tela {
     }
 
     // Pinta a tela
-    public static atualizar(pista: Pista, carros: Carro[], delta: number) {
+    public static atualizar(pista: Pista, carros: Carro[]) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // Desenha o fundo e a pista
         ctx.imageSmoothingEnabled = false;
-        // Manipula o canvas
         pista.matriz.forEach((elemento, pos) => {
             const x = pista.posReal(pos).x;
             const y = pista.posReal(pos).y;
@@ -77,7 +77,10 @@ export default class Tela {
                 }
             }
         });
+        // Atualiza os carros
+        carros.forEach(carro => carro.update());
         // Desenha os carros
+        ctx.imageSmoothingEnabled = true;
         carros.forEach(carro => {
             ctx.save();
             let transform = carro.getTransform();
@@ -87,8 +90,7 @@ export default class Tela {
             // Transformação local
             ctx.scale(0.2, 0.2);
             ctx.rotate(transform.angle);
-            ctx.translate(-imagem.width/2, -imagem.height/2);
-            ctx.drawImage(imagem, 0, 0);
+            ctx.drawImage(imagem, -imagem.width/2, -imagem.height/2);
             ctx.restore();
         });
     }
