@@ -29,7 +29,7 @@ window.pista = new Pista([
 // Cria os carros
 let carros = new Array<Carro>();
 let posInicio = window.pista.getPosInicio();
-for (let i = 0; i < 20; i++) {
+for (let i = 0; i < 1; i++) {
     let carro = new Carro(posInicio.x, posInicio.y);
     carro.registrar(window.engine.world);
     carros.push(carro);

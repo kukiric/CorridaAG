@@ -86,7 +86,7 @@ export default class Tela {
                         ctx.strokeStyle = "red";
                     }
                     else {
-                        ctx.strokeStyle = "green";
+                        ctx.strokeStyle = "white";
                     }
                     ctx.moveTo(raio.inicio.x, raio.inicio.y);
                     ctx.lineTo(raio.fim.x, raio.fim.y);
