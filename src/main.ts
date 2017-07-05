@@ -8,7 +8,7 @@ declare global {
     interface Window {
         engine: Matter.Engine;
         pista: Pista;
-        rodando: boolean;
+        fim: boolean;
     }
 }
 
@@ -31,7 +31,7 @@ window.pista = new Pista([
 // Cria os carros
 let carros = new Array<Carro>();
 let posInicio = window.pista.getPosInicio();
-for (let i = 0; i < 1; i++) {
+for (let i = 0; i < 20; i++) {
     let carro = new Carro(posInicio.x, posInicio.y);
     carro.registrar(window.engine.world);
     carros.push(carro);
@@ -42,14 +42,21 @@ window.addEventListener("keypress", (ev) => {
     if (ev.key == "r") {
         Tela.debug = !Tela.debug;
     }
-})
+});
+
+let simulando = true;
+let geracao = 1;
 
 // Define a função principal
 let main = () => {
     // Atualiza a simulação
-    if (window.rodando) {
+    if (simulando) {
         Matter.Engine.update(window.engine, 1/60);
-        carros.forEach(carro => carro.update());
+        carros.forEach(carro => carro.update(1/60));
+        // Termina a geração quando todos os carros estiverem parados
+        if (carros.every(carro => carro.morto)) {
+            simulando = false;
+        }
         Tela.atualizar(window.pista, carros);
     }
     // Cria a próxima geraçào
@@ -72,19 +79,30 @@ let main = () => {
         });
         // Reconstroi os carros com os novos cromossomos
         carros = carros.map((carro, i) => {
-            return new Carro(posInicio.x, posInicio.y, cromossomos[i]);
+            carro.remover(window.engine.world);
+            let novo = new Carro(posInicio.x, posInicio.y, cromossomos[i]);
+            novo.registrar(window.engine.world);
+            return novo;
         });
         // Volta à simulação
-        window.rodando = true;
+        simulando = true;
+        geracao++;
+        alert("Geracao " + geracao);
     }
-    requestAnimationFrame(main);
+    if (window.fim) {
+        alert("Corrida concluída!");
+    }
+    else {
+        requestAnimationFrame(main);
+    }
 };
 
 // Entra em loop assim que as sprites forem carregadas
 let loop = setInterval(() => {
     if (Tela.tudoPronto()) {
         clearInterval(loop);
-        window.rodando = true;
+        window.fim = false;
+        alert("Geracão " + geracao);
         requestAnimationFrame(main);
     }
 }, 10);

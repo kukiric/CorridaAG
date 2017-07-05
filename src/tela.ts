@@ -89,7 +89,7 @@ export default class Tela {
         });
         // Desenha os raycasts
         if (Tela.debug) {
-            carros.forEach(carro => {
+            carros.filter(carro => !carro.morto).forEach(carro => {
                 carro.getRaycasts().forEach(raio => {
                     ctx.beginPath();
                     if (raio.objetos.length > 0) {

@@ -34,8 +34,10 @@ export default class Carro {
     private blocoAtual: number;
     private raycasts: Raycast[];
     private rede: Synaptic.Network;
+    private tempoParado: number;
     public cromossomo: Cromossomo;
     public nomeSprite: string;
+    public morto: boolean;
 
     constructor(x: number, y: number, gene?: Cromossomo) {
         this.obj = Matter.Bodies.rectangle(x, y, 14, 24);
@@ -46,6 +48,8 @@ export default class Carro {
         this.obj.collisionFilter.category = 0b0010;
         this.blocoAtual = 0;
         this.nomeSprite = _.sample(Object.keys(Tela.sprites));
+        this.tempoParado = 0;
+        this.morto = false;
         if (gene == undefined) {
             gene = Cromossomo.aleatorio();
         }
@@ -72,21 +76,18 @@ export default class Carro {
     }
 
     public atualizaBloco(novoBloco: number) {
-        // Aumenta o fitness
+        // Aumenta o fitness se avançar pra frente
         if (novoBloco == this.blocoAtual + 1) {
-            console.log("carro foi pra frente!");
             this.blocoAtual = novoBloco;
             this.cromossomo.fitness = novoBloco;
+            this.tempoParado = 0;
             if (novoBloco > Tela.melhor) {
                 Tela.melhor = novoBloco;
             }
         }
         // Completa a simulação
         else if (this.blocoAtual == window.pista.max && novoBloco == 1) {
-            alert("Um carro completou a corrida!");
-        }
-        else {
-            console.log("carro indo pra tras!");
+            window.fim = true;
         }
     }
 
@@ -111,7 +112,11 @@ export default class Carro {
         return this.raycasts;
     }
 
-    public update() {
+    public update(delta: number) {
+        // Não anda depois de morrer
+        if (this.morto) {
+            return;
+        }
         // Move o carro
         let forcaAceleracao = {x: 0, y: -2};
         let forcaDirecionada = Matter.Vector.rotate(forcaAceleracao, this.obj.angle);
@@ -129,8 +134,16 @@ export default class Carro {
                 objetos: objetos
             };
         });
+        // Morre se ficar parado por muito tempo
+        this.tempoParado += delta;
+        if (this.tempoParado > 3) {
+            this.morto = true;
+            console.log("rip");
+            return;
+        }
         // Aplica a rede neural
-        let saidas = this.rede.activate(this.raycasts.map(raio => (raio.objetos.length > 0) ? 1 : 0));
+        let entradas = this.raycasts.map(raio => (raio.objetos.length > 0) ? 1 : 0);
+        let saidas = this.rede.activate(entradas);
         let forcaEsquerda = saidas[0];
         let forcaDireita = saidas[1];
         let direcao = forcaDireita - forcaEsquerda;

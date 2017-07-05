@@ -28,10 +28,10 @@ export default class Cromossomo {
         this.redeJson = rede;
     }
 
-    // Cria um novo individũo sem aprendizado
+    // Cria um novo individuo sem aprendizado
     public static aleatorio() {
         let novo = new Cromossomo();
-        novo.redeJson = new Synaptic.Architect.Perceptron(9, 12, 2).toJSON();
+        novo.redeJson = new Synaptic.Architect.Perceptron(9, 7, 5, 4, 2).toJSON();
         return novo;
     }
 
@@ -55,6 +55,7 @@ export default class Cromossomo {
             }
             return con;
         });
+        console.log("pai1: ", this, "pai2", outro, "filho: ", novo);
         return novo;
     }
 
