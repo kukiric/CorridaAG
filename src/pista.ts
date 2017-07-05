@@ -3,6 +3,7 @@ import * as _ from "lodash";
 
 export default class Pista {
 
+    public objs: Matter.Body[];
     public matriz: number[];
     public colunas: number;
     public linhas: number;
@@ -16,12 +17,14 @@ export default class Pista {
         this.escala = escala;
         this.max = _.max(matriz);
         // Cria os objetos na engine de fisica
+        this.objs = [];
         matriz.forEach((elemento, i) => {
             let pos = this.posRealCentro(i);
             if (elemento == 0) {
                 let obj = Matter.Bodies.rectangle(pos.x, pos.y, this.escala, this.escala);
                 Matter.Body.setStatic(obj, true);
                 Matter.World.addBody(mundo, obj);
+                this.objs.push(obj);
             }
         });
     }

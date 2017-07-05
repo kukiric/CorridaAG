@@ -77,8 +77,23 @@ export default class Tela {
                 }
             }
         });
-        // Atualiza os carros
-        carros.forEach(carro => carro.update());
+        // Desenha os raycasts
+        if (Tela.debug) {
+            carros.forEach(carro => {
+                carro.getRaycasts().forEach(raio => {
+                    ctx.beginPath();
+                    if (raio.objetos.length > 0) {
+                        ctx.strokeStyle = "red";
+                    }
+                    else {
+                        ctx.strokeStyle = "green";
+                    }
+                    ctx.moveTo(raio.inicio.x, raio.inicio.y);
+                    ctx.lineTo(raio.fim.x, raio.fim.y);
+                    ctx.stroke();
+                });
+            });
+        }
         // Desenha os carros
         ctx.imageSmoothingEnabled = true;
         carros.forEach(carro => {

@@ -6,7 +6,7 @@ import Carro from "./carro";
 declare global {
     interface Window {
         engine: Matter.Engine;
-        escalaFisica: number;
+        pista: Pista;
     }
 }
 
@@ -14,7 +14,7 @@ declare global {
 window.engine = Matter.Engine.create();
 
 // Cria a pista
-const pista = new Pista([
+window.pista = new Pista([
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  8,  9,  10, 0,  14, 15, 16, 0,
     0,  0,  6,  7,  0,  11, 12, 13, 0,  17, 0,
@@ -28,8 +28,8 @@ const pista = new Pista([
 
 // Cria os carros
 let carros = new Array<Carro>();
-let posInicio = pista.getPosInicio();
-for (let i = 1; i < 10; i++) {
+let posInicio = window.pista.getPosInicio();
+for (let i = 0; i < 20; i++) {
     let carro = new Carro(posInicio.x, posInicio.y);
     carro.registrar(window.engine.world);
     carros.push(carro);
@@ -47,13 +47,12 @@ let ultimoTempo = performance.now();
 // Define a função principal
 let main = () => {
     let tempoAtual = performance.now();
-    Matter.Engine.update(window.engine, (1000/60)/1000);
-    Tela.atualizar(pista, carros);
+    Matter.Engine.update(window.engine, 1/60);
+    carros.forEach(carro => carro.update());
+    Tela.atualizar(window.pista, carros);
     ultimoTempo = tempoAtual;
     requestAnimationFrame(main);
-}
-
-console.log(window.engine.world);
+};
 
 // Entra em loop assim que as sprites forem carregadas
 let loop = setInterval(() => {
