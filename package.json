@@ -9,7 +9,9 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@types/matter-js": "^0.9.32",
     "@types/synaptic": "^1.0.2",
+    "matter-js": "^0.12.0",
     "synaptic": "^1.0.12",
     "ts-loader": "^2.2.2",
     "typescript": "^2.4.1",

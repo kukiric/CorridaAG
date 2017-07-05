@@ -1,5 +1,5 @@
-import {Pista} from "./pista";
-import {Carro} from "./carro";
+import Pista from "./pista";
+import Carro from "./carro";
 
 // Pega o canvas do HTML
 const canvas = <HTMLCanvasElement>document.getElementById("canvas");
@@ -25,7 +25,7 @@ export class Sprite {
     }
 }
 
-export class Graficos {
+export default class Graficos {
 
     public static sprites = {
         carroPreto: new Sprite("sprites/car_black_5.png"),
@@ -61,7 +61,11 @@ export class Graficos {
                 if (elemento == 0) {
                     ctx.fillStyle = "#8AC466";
                 }
-                // Pista
+                // Faixa de partida
+                else if (elemento == 1) {
+                    ctx.fillStyle = "#A2A2A2";
+                }
+                // Pista comum
                 else {
                     ctx.fillStyle = "#878787";
                 }

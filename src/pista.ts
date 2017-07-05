@@ -1,4 +1,4 @@
-export class Pista {
+export default class Pista {
 
     public matriz: number[][];
     public largura: number;
