@@ -53,25 +53,14 @@ export default class Carro {
         Matter.Events.on(window.engine, "collisionStart", (evento) => {
             // Checa se a colisão é com o chão
             evento.pairs.forEach(par => {
-                console.log("colidiu ", par.bodyA.label, " com ", par.bodyB.label);
                 let outro = par.bodyA as ChaoPista;
-                // Chão
                 if (outro.label === "Chão") {
                     this.atualizaBloco(outro.numero);
                 }
-                // Parede
-                else if (outro.label === "Parede") {
-                    this.score *= 0.9;
-                }
                 else {
                     outro = par.bodyB as ChaoPista;
-                    // Chão
                     if (outro.label === "Chão") {
                         this.atualizaBloco(outro.numero);
-                    }
-                    // Parede
-                    else if (outro.label === "Parede") {
-                        this.score *= 0.95;
                     }
                 }
             });
