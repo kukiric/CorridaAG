@@ -30,7 +30,6 @@ export default class Carro {
     ];
 
     private obj: BodyCarro;
-    private score: number;
     private raycasts: Raycast[];
     private tempoParado: number;
     public rede: Neataptic.Network;
@@ -45,11 +44,11 @@ export default class Carro {
         // Categoria dos carros (penúltimo bit)
         this.obj.collisionFilter.category = 0b0010;
         this.obj.label = "Carro";
-        this.score = 0;
         this.nomeSprite = _.sample(Object.keys(Tela.sprites));
         this.tempoParado = 0;
         this.morto = false;
-        this.rede = rede
+        this.rede = rede;
+        this.rede.score = 0;
         Matter.Events.on(window.engine, "collisionStart", (evento) => {
             // Checa se a colisão é com o chão
             evento.pairs.forEach(par => {
@@ -69,7 +68,7 @@ export default class Carro {
 
     public atualizaBloco(novoBloco: number) {
         // Aumenta o fitness se avançar pra frente
-        if (novoBloco == this.score + 1) {
+        if (novoBloco == this.rede.score + 1) {
             this.rede.score++;
             this.tempoParado = 0;
             if (novoBloco > Tela.melhor) {
@@ -77,7 +76,7 @@ export default class Carro {
             }
         }
         // Completa a simulação
-        else if (this.score == window.pista.max && novoBloco == 1) {
+        else if (this.rede.score == window.pista.max && novoBloco == 1) {
             window.fim = true;
         }
     }
