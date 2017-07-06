@@ -109,7 +109,7 @@ export default class Carro {
             return;
         }
         // Move o carro
-        let forcaAceleracao = {x: 0, y: -2};
+        let forcaAceleracao = {x: 0, y: -2.5};
         let forcaDirecionada = Matter.Vector.rotate(forcaAceleracao, this.obj.angle);
         Matter.Body.setVelocity(this.obj, forcaDirecionada);
         // Verifica as colisões
