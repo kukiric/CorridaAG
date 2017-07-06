@@ -33,6 +33,9 @@ window.addEventListener("keypress", (ev) => {
     if (ev.key == "r") {
         Tela.debug = !Tela.debug;
     }
+    else if (ev.key == " ") {
+        simulando = false;
+    }
 });
 
 let simulando = true;
@@ -84,15 +87,16 @@ let main = () => {
         // Volta à simulação
         simulando = true;
         console.log("Geracao ", geracao++);
+        Tela.geracao = geracao;
     }
     // Atualiza a simulação    
     else {
         Matter.Engine.update(window.engine, 1/60);
         carros.forEach(carro => carro.update(1/60));
         // Termina a geração quando todos os carros estiverem parados
-        if (carros.every(carro => carro.morto)) {
-            simulando = false;
-        }
+        // if (carros.every(carro => carro.morto)) {
+        //     simulando = false;
+        // }
         Tela.atualizar(window.pista, carros);
     }
     if (window.fim) {

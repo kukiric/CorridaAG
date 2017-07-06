@@ -37,6 +37,7 @@ export default class Tela {
 
     public static debug = false;
     public static melhor = 0;
+    public static geracao = 1;
 
     // Checa se todas as sprites estão carregadas
     public static tudoPronto() {
@@ -122,5 +123,6 @@ export default class Tela {
         ctx.fillStyle = "white";
         ctx.font = "40px sans-serif";
         ctx.fillText("Melhor fitness: " + Tela.melhor, 16, 56);
+        ctx.fillText("Geracão: " + Tela.geracao, 16, 96);
     }
 }

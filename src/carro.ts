@@ -69,7 +69,7 @@ export default class Carro {
     public atualizaBloco(novoBloco: number) {
         // Aumenta o fitness se avançar pra frente
         if (novoBloco == this.rede.score + 1) {
-            this.rede.score++;
+            this.rede.score = novoBloco;
             this.tempoParado = 0;
             if (novoBloco > Tela.melhor) {
                 Tela.melhor = this.rede.score;
@@ -126,10 +126,10 @@ export default class Carro {
         });
         // Morre se ficar parado por muito tempo
         this.tempoParado += delta;
-        if (this.tempoParado > 3) {
-            this.morto = true;
-            return;
-        }
+        // if (this.tempoParado > 3) {
+        //     this.morto = true;
+        //     return;
+        // }
         // Aplica a rede neural
         let entradas = this.raycasts.map(raio => (raio.objetos.length > 0) ? 1 : 0);
         let saidas = this.rede.activate(entradas);
