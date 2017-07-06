@@ -1,8 +1,7 @@
-import * as Synaptic from "synaptic";
+import * as Neataptic from "neataptic";
 import * as Matter from "matter-js";
 import * as _ from "lodash";
 import Tela from "./tela";
-import Cromossomo from "./ag";
 import {ChaoPista} from "./pista";
 
 interface Raycast {
@@ -17,7 +16,7 @@ export interface BodyCarro extends Matter.Body {
 
 export default class Carro {
 
-    private static raiosChecagem = [
+    public static raiosChecagem = [
         // Ângulo em graus e distância
         [-60, 66],
         [-45, 83],
@@ -31,62 +30,65 @@ export default class Carro {
     ];
 
     private obj: BodyCarro;
-    private blocoAtual: number;
+    private score: number;
     private raycasts: Raycast[];
-    private rede: Synaptic.Network;
     private tempoParado: number;
-    public cromossomo: Cromossomo;
+    public rede: Neataptic.Network;
     public nomeSprite: string;
     public morto: boolean;
 
-    constructor(x: number, y: number, gene?: Cromossomo) {
+    constructor(x: number, y: number, rede?: Neataptic.Network) {
         this.obj = Matter.Bodies.rectangle(x, y, 14, 24);
         this.obj.carro = this;
         // Colide somente com as paredes (último bit)
         this.obj.collisionFilter.mask = 0b0001;
         // Categoria dos carros (penúltimo bit)
         this.obj.collisionFilter.category = 0b0010;
-        this.blocoAtual = 0;
+        this.obj.label = "Carro";
+        this.score = 0;
         this.nomeSprite = _.sample(Object.keys(Tela.sprites));
         this.tempoParado = 0;
         this.morto = false;
-        if (gene == undefined) {
-            gene = Cromossomo.aleatorio();
-        }
-        this.cromossomo = gene;
-        this.cromossomo.fitness = this.blocoAtual;
-        this.rede = Synaptic.Network.fromJSON(this.cromossomo.redeJson);
-        Matter.Events.on(window.engine, "collisionStart", this.onColisao.bind(this));
-    }
-
-    public onColisao(evento: Matter.IEventCollision<Matter.Engine>) {
-        // Checa se a colisão é com o chão
-        evento.pairs.forEach(par => {
-            let chao = par.bodyA as ChaoPista;
-            if (chao.numero !== undefined) {
-                this.atualizaBloco(chao.numero);
-            }
-            else {
-                chao = par.bodyA as ChaoPista;
-                if (chao.numero !== undefined) {
-                    this.atualizaBloco(chao.numero);
+        this.rede = rede
+        Matter.Events.on(window.engine, "collisionStart", (evento) => {
+            // Checa se a colisão é com o chão
+            evento.pairs.forEach(par => {
+                console.log("colidiu ", par.bodyA.label, " com ", par.bodyB.label);
+                let outro = par.bodyA as ChaoPista;
+                // Chão
+                if (outro.label === "Chão") {
+                    this.atualizaBloco(outro.numero);
                 }
-            }
-        })
+                // Parede
+                else if (outro.label === "Parede") {
+                    this.score *= 0.9;
+                }
+                else {
+                    outro = par.bodyB as ChaoPista;
+                    // Chão
+                    if (outro.label === "Chão") {
+                        this.atualizaBloco(outro.numero);
+                    }
+                    // Parede
+                    else if (outro.label === "Parede") {
+                        this.score *= 0.95;
+                    }
+                }
+            });
+        });
     }
 
     public atualizaBloco(novoBloco: number) {
         // Aumenta o fitness se avançar pra frente
-        if (novoBloco == this.blocoAtual + 1) {
-            this.blocoAtual = novoBloco;
-            this.cromossomo.fitness = novoBloco;
+        if (novoBloco == this.score + 1) {
+            this.rede.score++;
             this.tempoParado = 0;
             if (novoBloco > Tela.melhor) {
-                Tela.melhor = novoBloco;
+                Tela.melhor = this.rede.score;
             }
         }
         // Completa a simulação
-        else if (this.blocoAtual == window.pista.max && novoBloco == 1) {
+        else if (this.score == window.pista.max && novoBloco == 1) {
             window.fim = true;
         }
     }
@@ -138,14 +140,13 @@ export default class Carro {
         this.tempoParado += delta;
         if (this.tempoParado > 3) {
             this.morto = true;
-            console.log("rip");
             return;
         }
         // Aplica a rede neural
         let entradas = this.raycasts.map(raio => (raio.objetos.length > 0) ? 1 : 0);
         let saidas = this.rede.activate(entradas);
-        let forcaEsquerda = saidas[0];
-        let forcaDireita = saidas[1];
+        let forcaEsquerda = _.clamp(saidas[0], 0, 1);
+        let forcaDireita = _.clamp(saidas[1], 0, 1);
         let direcao = forcaDireita - forcaEsquerda;
         Matter.Body.setAngularVelocity(this.obj, 0.25 * direcao);
     }
